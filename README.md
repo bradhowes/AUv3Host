@@ -8,6 +8,8 @@ My version allows for multiple instances of the same AUv3 component with user-de
 present, only the iOS version is usable -- the macOS version is more or less the same as Apple's code, but it will not
 compile in the current state.
 
+![](app.png)
+
 # Customizing
 
 If you want to use this host for your own testing purposes, you will simply need to change the definition of the
