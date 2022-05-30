@@ -45,5 +45,6 @@ The project itself consists of three internal Swift packages:
 supports the `Codable` protocol uses to save/restore values to/from `UserDefaults`.
 
 Additionally, the code also depends on the external [AUv3Support](https://github.com/bradhowes/AUv3Support) Swift
-package that my AUv3 components also depend on.
-
+package that my AUv3 components also depend on. It also relies on Apple's 
+[Swift Atomics](https://github.com/apple/swift-atomics) to provide thread-safe changes to a few values using native
+Swift constructs.
