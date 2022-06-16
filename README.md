@@ -41,8 +41,8 @@ The project itself consists of three internal Swift packages:
 * AudioUnitHost -- the hosting code for the AUv3 components
 * PresetDocumentManager -- handles preset creation, updating, and deletion as well as saving and restoring from 
 `UserDefaults`
-* TypedFullState -- conversion between the `fullState` type of `[String: Any]` and a typed-Any representation that can
-supports the `Codable` protocol uses to save/restore values to/from `UserDefaults`.
+* TypedFullState -- conversion between the `fullState` type of `[String: Any]` and a typed-Any representation that
+implements the `Codable` protocol. Used to save/restore values to/from `UserDefaults`.
 
 Additionally, the code also depends on the external [AUv3Support](https://github.com/bradhowes/AUv3Support) Swift
 package that my AUv3 components also depend on. It also relies on Apple's 
