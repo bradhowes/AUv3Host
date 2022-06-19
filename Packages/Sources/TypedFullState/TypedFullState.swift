@@ -20,11 +20,11 @@ public enum TypedAnyError: Error {
 public enum TypedAny: Codable {
   /// String value
   case string(value: String)
-  /// Int (Int64) value
+  /// Int/Int64 value
   case int(value: Int)
   /// Double value
   case double(value: Double)
-  /// Float value
+  /// AUValue/Float value
   case auValue(value: AUValue)
   /// Data value
   case data(value: Data)
@@ -85,6 +85,19 @@ public enum TypedAny: Codable {
     }
   }
 
+  /// Obtain the type name for the wrapped value
+  var typeName: String {
+    switch self {
+    case .string: return "String"
+    case .int: return "Int"
+    case .double: return "Double"
+    case .auValue: return "AUValue"
+    case .data: return "Data"
+    case .dict: return "Dict"
+    case .array: return "Array"
+    }
+  }
+
   /// Type-erase to Any
   var asAny: Any {
     switch self {
@@ -133,7 +146,7 @@ public enum TypedAny: Codable {
 }
 
 extension TypedAny: CustomDebugStringConvertible {
-  public var debugDescription: String { self.asString }
+  public var debugDescription: String { "<TypedAny: \(self.typeName) - \(self.asString)>" }
 }
 
 extension TypedAny: Equatable {}

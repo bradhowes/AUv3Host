@@ -20,6 +20,20 @@
                ReferencedContainer = "container:AUv3Host.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AudioUnitHostTests"
+               BuildableName = "AudioUnitHostTests"
+               BlueprintName = "AudioUnitHostTests"
+               ReferencedContainer = "container:Packages">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -41,10 +55,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BD201D7C28392FE40032430F"
-               BuildableName = "AUv3HostTests_iOS.xctest"
-               BlueprintName = "AUv3HostTests_iOS"
-               ReferencedContainer = "container:AUv3Host.xcodeproj">
+               BlueprintIdentifier = "AudioUnitHostTests"
+               BuildableName = "AudioUnitHostTests"
+               BlueprintName = "AudioUnitHostTests"
+               ReferencedContainer = "container:Packages">
             </BuildableReference>
          </TestableReference>
       </Testables>
