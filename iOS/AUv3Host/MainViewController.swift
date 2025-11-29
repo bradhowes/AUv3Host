@@ -5,13 +5,12 @@
  The view controller presenting the main view.
  */
 
-import UIKit
 import AVFoundation
 import CoreAudioKit
-import AUv3Support
 import AudioUnitHost
 import PresetDocumentManager
 import TypedFullState
+import SwiftUI
 
 class MainViewController: UIViewController {
 
@@ -28,6 +27,7 @@ class MainViewController: UIViewController {
   @IBOutlet weak var playScale: UIButton!
   @IBOutlet weak var playNote: UIButton!
   @IBOutlet weak var deletePresetButton: UIButton!
+  @IBOutlet weak var renamePresetButton: UIButton!
   @IBOutlet weak var savePresetButton: UIButton!
   @IBOutlet weak var addPresetButton: UIButton!
   @IBOutlet weak var instancesTableView: UITableView!
@@ -43,10 +43,12 @@ class MainViewController: UIViewController {
   var audioUnitNameObservers = [NSKeyValueObservation]()
   var isConnected = false
   var isLoaded = false
+  var connectedClock: Date = .init()
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setInstanceCount(Self.instanceCount)
+    connectedClock = Date()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -116,6 +118,12 @@ class MainViewController: UIViewController {
     }
   }
 
+  @IBAction func renamePreset(_ sender: UIButton) {
+    if let indexPath = presetsTableView.indexPathForSelectedRow {
+      renamePreset(indexPath: indexPath)
+    }
+  }
+
   @IBAction func addPreset(_ sender: UIButton) {
     let index = presetDocumentManager.count
     askForName(title: "New Preset", name: "Preset \(index + 1)", activity: "Add") { name in
@@ -129,6 +137,25 @@ class MainViewController: UIViewController {
     }
   }
 
+  @IBAction func reload(_ sender: UIButton) {
+    removeAUViewController()
+    connectedClock = Date()
+    self.audioUnitHost.recreate()
+  }
+
+  private func renamePreset(indexPath: IndexPath) {
+    let name = presetDocumentManager.name(at: indexPath.row)
+    askForName(title: "Rename Preset", name: "\(name)", activity: "Update") { name in
+      self.presetDocumentManager.rename(at: indexPath.row, name: name)
+      self.presetsTableView.beginUpdates()
+      self.presetsTableView.reloadRows(at: [indexPath], with: .automatic)
+      self.presetsTableView.endUpdates()
+      self.updatePresetButtons()
+      let uuid = self.presetDocumentManager.uuid(at: indexPath.row)
+      self.audioUnitHost.makeFullStateCollection(uuid: uuid)
+    }
+  }
+
   private func deletePreset(indexPath: IndexPath) {
     presetsTableView.beginUpdates()
     presetsTableView.deleteRows(at: [indexPath], with: .automatic)
@@ -139,6 +166,7 @@ class MainViewController: UIViewController {
 
   private func updatePresetButtons() {
     let selected = presetsTableView.indexPathForSelectedRow != nil
+    renamePresetButton.isEnabled = selected
     deletePresetButton.isEnabled = selected
     savePresetButton.isEnabled = selected
   }
@@ -147,6 +175,9 @@ class MainViewController: UIViewController {
 extension MainViewController: AudioUnitHostDelegate {
 
   func connected(audioUnits: [AVAudioUnit], viewControllers: [AVAudioUnit: ViewController]) {
+    let duration = Date().timeIntervalSince(connectedClock)
+    print(duration)
+
     stopMonitoringAudioUnitNames()
     removeAUViewController()
     self.audioUnits = audioUnits
@@ -154,9 +185,15 @@ extension MainViewController: AudioUnitHostDelegate {
     isConnected = true
     startMonitoringAudioUnitNames()
     self.instancesTableView.reloadData()
-
     if !audioUnits.isEmpty {
       selected(audioUnits[0], controller: viewControllers[audioUnits[0]])
+    }
+
+    if presetsTableView.numberOfRows(inSection: 0) > 0 {
+      let indexPath = IndexPath(row: 0, section: 0)
+      presetsTableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+      audioUnitHost.setFullStateCollection(presetDocumentManager.fullStateCollection(at: indexPath.row))
+      updatePresetButtons()
     }
   }
 

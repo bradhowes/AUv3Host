@@ -1,6 +1,6 @@
 // Copyright © 2020 Brad Howes. All rights reserved.
 
-import os.log
+import OSLog
 import Atomics
 import AVFoundation
 import CoreAudioKit
@@ -10,8 +10,11 @@ import TypedFullState
 /// Component description that matches the AudioUnit to load. The values must match those found in the Info.plist
 let componentToLoad: AudioComponentDescription = .init(
   componentType: FourCharCode(stringLiteral: "aumu"),
-  componentSubType: FourCharCode(stringLiteral: "sfnt"),
-  componentManufacturer: FourCharCode(stringLiteral: "bray"),
+  componentSubType: FourCharCode(stringLiteral: "Sf2P"),
+  componentManufacturer: FourCharCode(stringLiteral: "BRay"),
+//  componentType: FourCharCode(stringLiteral: "aumu"),
+//  componentSubType: FourCharCode(stringLiteral: "sfnt"),
+//  componentManufacturer: FourCharCode(stringLiteral: "BRay"),
   componentFlags: 0,
   componentFlagsMask: 0
 )
@@ -75,7 +78,7 @@ public protocol AudioUnitHostDelegate: AnyObject {
  provides.
  */
 public final class AudioUnitHost {
-  private let log = Shared.logger("AudioUnitHost")
+  private let log = Logger(subsystem: "com.braysoftware.AUv3Host", category: "AudioUnitHost")
 
   private let fifo = DispatchQueue(label: "AudioUnitHostFIFO", qos: .userInitiated, attributes: [],
                                    autoreleaseFrequency: .inherit, target: .main)
@@ -139,6 +142,17 @@ public final class AudioUnitHost {
       for (audioUnit, fullState) in zip(self.audioUnits, fullStateCollection) {
         audioUnit.auAudioUnit.fullState = fullState
       }
+    }
+  }
+
+  public func recreate() {
+    fifo.async {
+      for audioUnit in self.audioUnits {
+        self.playEngine.disconnect(audioUnit: audioUnit)
+      }
+      self.audioUnits = []
+      self.viewControllers = [:]
+      self.createAudioUnit(componentDescription: self.componentDescription)
     }
   }
 
@@ -266,10 +280,12 @@ public final class AudioUnitHost {
         self.fifo.async {
           self.createAudioUnit(componentDescription: audioUnit.audioComponentDescription)
         }
-      } else {
+      } else if self.audioUnits.count > self.instanceCount.load(ordering: .sequentiallyConsistent) {
         self.fifo.async {
           self.prune()
         }
+      } else {
+        notifyDelegate()
       }
     }
   }
@@ -282,8 +298,8 @@ public final class AudioUnitHost {
         playEngine.disconnect(audioUnit: audioUnit)
       }
       _ = viewControllers.dropLast(toRemove)
+      notifyDelegate()
     }
-    notifyDelegate()
   }
 
   private func notifyDelegate() {

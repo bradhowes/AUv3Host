@@ -1,31 +1,57 @@
-// swift-tools-version:5.5
+// swift-tools-version:6.0
 
 import PackageDescription
 
 let package = Package(
   name: "Packages",
-  platforms: [.iOS(.v13), .macOS(.v10_15)],
+  platforms: [.iOS(.v18), .macOS(.v15)],
   products: [
     .library(name: "AudioUnitHost", targets: ["AudioUnitHost"]),
-    .library(name: "PresetDocumentManager", targets: ["PresetDocumentManager"])
+    .library(name: "AUv3s", targets: ["AUv3s"]),
+    .library(name: "Presets", targets: ["Presets"]),
+    .library(name: "Root", targets: ["Root"])
   ],
   dependencies: [
-    .package(name: "AUv3SupportPackage", url: "https://github.com/bradhowes/AUv3Support", branch: "main"),
-    .package(name: "TypedFullState", url: "https://github.com/bradhowes/typedfullstate", branch: "main"),
-    .package(url: "https://github.com/apple/swift-atomics.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/bradhowes/auv3-support", branch: "main"),
+    .package(url: "https://github.com/bradhowes/typedfullstate", branch: "main"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.0.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.22.3"),
+    .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
+    .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.7.4"),
+    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.7"),
   ],
   targets: [
-    .target(name: "PresetDocumentManager",
+    .target(name: "AUv3s",
             dependencies: [
+              .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+              .product(name: "Dependencies", package: "swift-dependencies"),
+              .product(name: "Sharing", package: "swift-sharing"),
+              .product(name: "TypedFullState", package: "TypedFullState")
+            ]
+           ),
+    .target(name: "Presets",
+            dependencies: [
+              .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+              .product(name: "Dependencies", package: "swift-dependencies"),
+              .product(name: "Sharing", package: "swift-sharing"),
+              .product(name: "TypedFullState", package: "TypedFullState")
+            ]
+           ),
+    .target(name: "Root",
+            dependencies: [
+              .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+              .product(name: "Dependencies", package: "swift-dependencies"),
+              .product(name: "Sharing", package: "swift-sharing"),
               .product(name: "TypedFullState", package: "TypedFullState")
             ]
            ),
     .target(
       name: "AudioUnitHost",
       dependencies: [
-        .product(name: "AUv3-Support", package: "AUv3SupportPackage"),
+        .product(name: "AUv3Host", package: "auv3-support"),
+        .product(name: "AUv3Shared", package: "auv3-support"),
+        .product(name: "AUv3Component", package: "auv3-support"),
         .product(name: "TypedFullState", package: "TypedFullState"),
-        .product(name: "Atomics", package: "swift-atomics")
       ]
     ),
     .testTarget(

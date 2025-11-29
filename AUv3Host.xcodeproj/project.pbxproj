@@ -3,15 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		BD085FFF27A2EB13002B4E38 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD085FFE27A2EB13002B4E38 /* AudioToolbox.framework */; };
-		BDC58847284383A500385B84 /* AUv3-Support-macOS in Frameworks */ = {isa = PBXBuildFile; productRef = BDC58846284383A500385B84 /* AUv3-Support-macOS */; };
-		BDC5884B2843854F00385B84 /* AUv3-Support in Frameworks */ = {isa = PBXBuildFile; productRef = BDC5884A2843854F00385B84 /* AUv3-Support */; };
 		BDC5884D2843859D00385B84 /* AudioUnitHost in Frameworks */ = {isa = PBXBuildFile; productRef = BDC5884C2843859D00385B84 /* AudioUnitHost */; };
-		BDC5884F28438F6200385B84 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = BDC5884E28438F6200385B84 /* Atomics */; };
 		BDC58851284390DD00385B84 /* PresetDocumentManager in Frameworks */ = {isa = PBXBuildFile; productRef = BDC58850284390DD00385B84 /* PresetDocumentManager */; };
 		C404AF0B224E92E900DA7170 /* ComponentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C404AF0A224E92E900DA7170 /* ComponentViewController.swift */; };
 		C4073D3D22723FAE0049E662 /* AlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4073D3C22723FAE0049E662 /* AlertExtensions.swift */; };
@@ -66,8 +63,6 @@
 			files = (
 				BD085FFF27A2EB13002B4E38 /* AudioToolbox.framework in Frameworks */,
 				BDC5884D2843859D00385B84 /* AudioUnitHost in Frameworks */,
-				BDC5884B2843854F00385B84 /* AUv3-Support in Frameworks */,
-				BDC5884F28438F6200385B84 /* Atomics in Frameworks */,
 				BDC58851284390DD00385B84 /* PresetDocumentManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,7 +71,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDC58847284383A500385B84 /* AUv3-Support-macOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,9 +192,7 @@
 			);
 			name = "AUv3Host iOS";
 			packageProductDependencies = (
-				BDC5884A2843854F00385B84 /* AUv3-Support */,
 				BDC5884C2843859D00385B84 /* AudioUnitHost */,
-				BDC5884E28438F6200385B84 /* Atomics */,
 				BDC58850284390DD00385B84 /* PresetDocumentManager */,
 			);
 			productName = "AUv3Host iOS";
@@ -221,7 +213,6 @@
 			);
 			name = "AUv3Host macOS";
 			packageProductDependencies = (
-				BDC58846284383A500385B84 /* AUv3-Support-macOS */,
 			);
 			productName = "AUv3Host macOS";
 			productReference = C40DA92B21FB6CD900F0FE9A /* AUv3Host.app */;
@@ -233,9 +224,10 @@
 		C40DA90A21FB6CAD00F0FE9A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1340;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 2610;
 				ORGANIZATIONNAME = Apple;
 				TargetAttributes = {
 					C40DA91321FB6CC600F0FE9A = {
@@ -258,8 +250,6 @@
 			);
 			mainGroup = C40DA90921FB6CAD00F0FE9A;
 			packageReferences = (
-				BD0E7FBE2831525900D2670E /* XCRemoteSwiftPackageReference "swift-atomics" */,
-				BDC58841284383A500385B84 /* XCRemoteSwiftPackageReference "AUv3Support" */,
 			);
 			productRefGroup = C40DA91521FB6CC600F0FE9A /* Products */;
 			projectDirPath = "";
@@ -361,8 +351,10 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -373,6 +365,11 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_MEMORY_SAFETY = YES;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -399,7 +396,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -409,6 +408,11 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_MEMORY_SAFETY = YES;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -451,7 +455,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -469,10 +472,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = iOS/AUv3Host/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -526,7 +531,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -538,10 +542,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = iOS/AUv3Host/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AUv3Host${SAMPLE_CODE_DISAMBIGUATOR}";
@@ -596,7 +602,6 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -619,6 +624,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -672,7 +678,6 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = UP6SS5ES7E;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -689,6 +694,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AUv3Host${SAMPLE_CODE_DISAMBIGUATOR}";
@@ -733,44 +739,10 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		BD0E7FBE2831525900D2670E /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-atomics.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		BDC58841284383A500385B84 /* XCRemoteSwiftPackageReference "AUv3Support" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bradhowes/AUv3Support";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		BDC58846284383A500385B84 /* AUv3-Support-macOS */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BDC58841284383A500385B84 /* XCRemoteSwiftPackageReference "AUv3Support" */;
-			productName = "AUv3-Support-macOS";
-		};
-		BDC5884A2843854F00385B84 /* AUv3-Support */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BDC58841284383A500385B84 /* XCRemoteSwiftPackageReference "AUv3Support" */;
-			productName = "AUv3-Support";
-		};
 		BDC5884C2843859D00385B84 /* AudioUnitHost */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AudioUnitHost;
-		};
-		BDC5884E28438F6200385B84 /* Atomics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BD0E7FBE2831525900D2670E /* XCRemoteSwiftPackageReference "swift-atomics" */;
-			productName = Atomics;
 		};
 		BDC58850284390DD00385B84 /* PresetDocumentManager */ = {
 			isa = XCSwiftPackageProductDependency;
