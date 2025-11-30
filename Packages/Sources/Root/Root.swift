@@ -46,31 +46,110 @@ public struct Root {
       case .initialize:
         return initialize(&state)
 
+      case .instances(.delegate(.added(instance: let instance))):
+        return addInstance(&state, instance: instance)
+
+      case .instances(.delegate(.removed(instance: let instance))):
+        return removeInstance(&state, instance: instance)
+
       case .instances:
         return .none
 
       case .noteButtonTapped:
-        return .none
+        return playNote(&state)
 
       case .playButtonTapped:
-        state.songPlaying.toggle()
-        return .none
+        return playButtonTapped(&state)
 
       case .presets:
         return .none
       }
     }
   }
+
+  private enum CancelId {
+    case playLoop
+  }
 }
 
 extension Root {
 
-  private func playButtonTapped(_ state: inout State) -> Effect<Action> {
+  private func addInstance(_ state: inout State, instance: AUv3Instance) -> Effect<Action> {
+    stopPlaying(&state)
+
+    let hardwareFormat = state.engine.outputNode.outputFormat(forBus: 0)
+    let stereoFormat = AVAudioFormat(standardFormatWithSampleRate: hardwareFormat.sampleRate, channels: 2)
+
+    state.engine.attach(instance.audioUnit)
+    state.engine.connect(instance.audioUnit, to: state.engine.mainMixerNode, format: stereoFormat)
     return .none
   }
 
   private func initialize(_ state: inout State) -> Effect<Action> {
     .none
+  }
+
+  private func playButtonTapped(_ state: inout State) -> Effect<Action> {
+    state.songPlaying ? stopPlaying(&state) : startPlaying(&state)
+  }
+
+  private func playNote(_ state: inout State) -> Effect<Action> {
+    updateAudioSession(active: true)
+    startEngine(&state)
+    return reduce(into: &state, action: .instances(.playNote))
+  }
+
+  private func removeInstance(_ state: inout State, instance: AUv3Instance) -> Effect<Action> {
+    stopPlaying(&state)
+    state.engine.disconnectNodeOutput(instance.audioUnit)
+    state.engine.detach(instance.audioUnit)
+    return .none
+  }
+
+  @discardableResult
+  private func startEngine(_ state: inout State) -> Effect<Action> {
+    guard !state.engine.isRunning else { return .none }
+    do {
+      try state.engine.start()
+      log.info("engine started")
+    } catch {
+      fatalError("Failed to start engine - \(error)")
+    }
+    return .none
+  }
+
+  private func startPlaying(_ state: inout State) -> Effect<Action> {
+    updateAudioSession(active: true)
+    let hardwareFormat = state.engine.outputNode.outputFormat(forBus: 0)
+    state.engine.connect(state.engine.mainMixerNode, to: state.engine.outputNode, format: hardwareFormat)
+    startEngine(&state)
+    state.songPlaying = true
+    return reduce(into: &state, action: .instances(.startLoops))
+  }
+
+  @discardableResult
+  private func stopPlaying(_ state: inout State) -> Effect<Action> {
+    if state.songPlaying == true {
+      state.songPlaying = false
+    }
+
+    if state.engine.isRunning {
+      state.engine.stop()
+    }
+
+    return reduce(into: &state, action: .instances(.stopLoops))
+  }
+
+  private func updateAudioSession(active: Bool) {
+#if os(iOS)
+    let session = AVAudioSession.sharedInstance()
+    do {
+      try session.setCategory(.playback, mode: .default)
+      try session.setActive(active)
+    } catch {
+      fatalError("Could not set Audio Session active \(active). error: \(error).")
+    }
+#endif
   }
 }
 

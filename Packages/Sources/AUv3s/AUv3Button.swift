@@ -1,6 +1,6 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
-import AudioToolbox
+@preconcurrency import AudioToolbox
 import ComposableArchitecture
 import Foundation
 import Support
@@ -28,6 +28,9 @@ public struct AUv3Button {
     case activateButtonTapped
     case delegate(Delegate)
     case deleteButtonTapped
+    case playNote
+    case startLoop
+    case stopLoop
 
     @CasePathable
     public enum Delegate {
@@ -43,6 +46,9 @@ public struct AUv3Button {
       case .activateButtonTapped: return activateButtonTapped(&state)
       case .delegate: return .none
       case .deleteButtonTapped: return deleteButtonTapped(&state)
+      case .playNote: return playNote(&state)
+      case .startLoop: return startLoop(&state)
+      case .stopLoop: return stopLoop(&state)
       }
     }
   }
@@ -57,6 +63,21 @@ extension AUv3Button {
 
   private func deleteButtonTapped(_ state: inout State) -> Effect<Action> {
     return .send(.delegate(.delete(id: state.id)))
+  }
+
+  private func playNote(_ state: inout State) -> Effect<Action> {
+    state.instance.audioUnit.auAudioUnit.playNote()
+    return .none
+  }
+
+  private func startLoop(_ state: inout State) -> Effect<Action> {
+    .run { [audioUnit = state.instance.audioUnit.auAudioUnit] send in
+      await audioUnit.playLoop()
+    }.cancellable(id: state.instance.id)
+  }
+
+  private func stopLoop(_ state: inout State) -> Effect<Action> {
+    .cancel(id: state.instance.id)
   }
 }
 

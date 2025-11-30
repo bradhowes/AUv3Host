@@ -22,8 +22,18 @@ public struct AUv3sList {
   public enum Action {
     case add(instance: AUv3Instance)
     case addButtonTapped
+    case delegate(Delegate)
     case initialize
     case rows(IdentifiedActionOf<AUv3Button>)
+    case playNote
+    case startLoops
+    case stopLoops
+
+    @CasePathable
+    public enum Delegate {
+      case added(instance: AUv3Instance)
+      case removed(instance: AUv3Instance)
+    }
   }
 
   public init() {}
@@ -42,14 +52,26 @@ public struct AUv3sList {
       case .addButtonTapped:
         return addButtonTapped(&state)
 
+      case .delegate:
+        return .none
+
       case .initialize:
         return initialize(&state)
+
+      case .playNote:
+        return playNote(&state)
 
       case .rows(.element(id: let id, action: .delegate(let action))):
         return processRowAction(&state, id: id, action: action)
 
       case .rows:
         return .none
+
+      case .startLoops:
+        return startLoops(&state)
+
+      case .stopLoops:
+        return stopLoops(&state)
       }
     }
     .forEach(\.rows, action: \.rows) {
@@ -62,7 +84,7 @@ extension AUv3sList {
 
   private func add(_ state: inout State, instance: AUv3Instance) -> Effect<Action> {
     state.rows.append(.init(instance: instance))
-    return .none
+    return .send(.delegate(.added(instance: instance)))
   }
 
   private func addButtonTapped(_ state: inout State) -> Effect<Action> {
@@ -79,6 +101,26 @@ extension AUv3sList {
     return .merge((0..<min(1, auv3InstanceCount)).map { _ in addButtonTapped(&state) })
   }
 
+  private func playNote(_ state: inout State) -> Effect<Action> {
+    @Shared(.activeAUv3) var activeAUv3
+    guard let activeAUv3 else { return .none }
+    guard let button = state.rows[id: activeAUv3] else { return .none }
+    button.instance.audioUnit.auAudioUnit.playNote()
+    return .none
+  }
+
+  private func startLoops(_ state: inout State) -> Effect<Action> {
+    .merge(state.rows.map {
+      reduce(into: &state, action: .rows(.element(id: $0.id, action: .startLoop)))
+    })
+  }
+
+  private func stopLoops(_ state: inout State) -> Effect<Action> {
+    .merge(state.rows.map {
+      reduce(into: &state, action: .rows(.element(id: $0.id, action: .stopLoop)))
+    })
+  }
+
   private func processRowAction(
     _ state: inout State,
     id: AUv3Button.State.ID,
@@ -92,12 +134,12 @@ extension AUv3sList {
       break
 
     case .delete(id: let id):
-      state.rows.remove(id: id)
+      guard let removed = state.rows.remove(id: id) else { return .none }
       @Shared(.activeAUv3) var activeAUv3
       if id == activeAUv3 {
         $activeAUv3.withLock { $0 = state.rows.last?.id }
       }
-      break
+      return .send(.delegate(.removed(instance: removed.instance)))
     }
 
     return .none
@@ -150,4 +192,10 @@ private let log = Logger(category: "AUv3sList")
 
 #Preview {
   AUv3sListView.preview
+}
+
+struct Previews_AUv3sList_LibraryContent: LibraryContentProvider {
+  var views: [LibraryItem] {
+    LibraryItem(/*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/)
+  }
 }
