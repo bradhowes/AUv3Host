@@ -2,8 +2,7 @@
 
 import AudioToolbox
 import ComposableArchitecture
-import Dependencies
-import DependenciesMacros
+import Sharing
 import Support
 import SwiftUI
 import TypedFullState
@@ -75,7 +74,9 @@ extension AUv3sList {
   }
 
   private func initialize(_ state: inout State) -> Effect<Action> {
-    return .none
+    @Shared(.auv3InstanceCount) var auv3InstanceCount
+    log.info("initialize: \(auv3InstanceCount)")
+    return .merge((0..<min(1, auv3InstanceCount)).map { _ in addButtonTapped(&state) })
   }
 
   private func processRowAction(
@@ -92,6 +93,10 @@ extension AUv3sList {
 
     case .delete(id: let id):
       state.rows.remove(id: id)
+      @Shared(.activeAUv3) var activeAUv3
+      if id == activeAUv3 {
+        $activeAUv3.withLock { $0 = state.rows.last?.id }
+      }
       break
     }
 

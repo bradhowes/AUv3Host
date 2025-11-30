@@ -1,5 +1,6 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
+import AVFAudio
 import AUv3s
 import ComposableArchitecture
 import Presets
@@ -14,9 +15,14 @@ public struct Root {
     public var instances: AUv3sList.State
     public var presets: PresetsList.State
 
+    @ObservationStateIgnored
+    public let engine = AVAudioEngine()
+    public var songPlaying: Bool
+
     public init(instances: AUv3sList.State, presets: PresetsList.State) {
       self.instances = instances
       self.presets = presets
+      self.songPlaying = false
     }
   }
 
@@ -35,7 +41,6 @@ public struct Root {
     Scope(state: \.presets, action: \.presets) { PresetsList() }
 
     Reduce { state, action in
-      log.info("reduce \(action)")
       switch action {
 
       case .initialize:
@@ -48,6 +53,7 @@ public struct Root {
         return .none
 
       case .playButtonTapped:
+        state.songPlaying.toggle()
         return .none
 
       case .presets:
@@ -64,36 +70,48 @@ extension Root {
   }
 
   private func initialize(_ state: inout State) -> Effect<Action> {
-    return .merge(
-      reduce(into: &state, action: .instances(.initialize)),
-      reduce(into: &state, action: .presets(.initialize))
-    )
+    .none
   }
 }
 
 public struct RootView: View {
   private var store: StoreOf<Root>
+  @Shared(.activeAUv3) var activeAUv3
 
   public init(store: StoreOf<Root>) {
     self.store = store
   }
 
   public var body: some View {
-    VStack {
-      HStack {
+    VStack(spacing: 16) {
+      HStack(spacing: 16) {
         AUv3sListView(store: store.scope(state: \.instances, action: \.instances))
         PresetsListView(store: store.scope(state: \.presets, action: \.presets))
       }
-      HStack {
-        Button {
-          store.send(.playButtonTapped)
-        } label: {
-          Text("Play")
-        }
-        Button {
-          store.send(.noteButtonTapped)
-        } label: {
-          Text("Note")
+      Grid(horizontalSpacing: 16.0) {
+        GridRow {
+          Button {
+            store.send(.playButtonTapped)
+          } label: {
+            Text(store.songPlaying ? "Stop Song" : "Start Song")
+          }.disabled(store.instances.rows.isEmpty)
+
+          Button {
+            store.send(.noteButtonTapped)
+          } label: {
+            Text("Instance Note")
+          }.disabled(activeAUv3 == nil)
+        }.frame(maxWidth: .infinity)
+      }
+      Group {
+        if let activeAUv3,
+           let index = store.instances.rows.index(id: activeAUv3) {
+          let row = store.instances.rows[index]
+          AUv3View(instance: row.instance)
+            .id(row.instance.id)
+        } else {
+          Text("No AUv3 instance selected")
+            .frame(maxHeight: .infinity)
         }
       }
     }
@@ -113,6 +131,7 @@ extension RootView {
     return VStack {
       RootView(store: Store(initialState: .init(instances: AUv3sList.State(), presets: PresetsList.State())) { Root() })
     }
+    .safeAreaPadding(16)
   }
 }
 
