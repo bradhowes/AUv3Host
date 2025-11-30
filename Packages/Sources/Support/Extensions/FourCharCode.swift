@@ -2,13 +2,6 @@
 
 import Foundation
 
-extension Character {
-  var isPrintableASCII: Bool {
-    guard let ascii = asciiValue else { return false }
-    return 32..<127 ~= ascii
-  }
-}
-
 extension FourCharCode {
 
   static var invalidFourCharCode: Self { 0x3F3F3F3F } // "????"
@@ -48,3 +41,10 @@ extension FourCharCode {
 }
 
 extension FourCharCode: @retroactive ExpressibleByStringLiteral {}
+
+extension Character {
+  fileprivate var isPrintableASCII: Bool {
+    guard let ascii = asciiValue else { return false }
+    return 32..<127 ~= ascii
+  }
+}

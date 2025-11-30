@@ -1,14 +1,17 @@
-//
-//  Component.swift
-//  Packages
-//
-//  Created by Brad Howes on 11/30/25.
-//
-
-// Copyright © 2025 Brad Howes. All rights reserved.
+// Copyright © 2020 Apple. All rights reserved.
 
 import AudioToolbox
 import Dependencies
+
+extension AudioComponentDescription {
+  public var description: String {
+    """
+type: \(componentType.stringValue), \
+subtype: \(componentSubType.stringValue), \
+manufacturer: \(componentManufacturer.stringValue)
+"""
+  }
+}
 
 extension AudioComponentDescription: @retroactive TestDependencyKey {
   public static var liveValue: AudioComponentDescription {
@@ -37,13 +40,5 @@ extension AudioComponentDescription: @retroactive TestDependencyKey {
       componentFlags: 0,
       componentFlagsMask: 0
     )
-  }
-}
-
-extension DependencyValues {
-
-  public var componentDescription: AudioComponentDescription {
-    get { self[AudioComponentDescription.self] }
-    set { self[AudioComponentDescription.self] = newValue }
   }
 }

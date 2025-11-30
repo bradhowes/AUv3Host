@@ -6,14 +6,12 @@ let package = Package(
   name: "Packages",
   platforms: [.iOS(.v18), .macOS(.v15)],
   products: [
-    .library(name: "AudioUnitHost", targets: ["AudioUnitHost"]),
     .library(name: "AUv3s", targets: ["AUv3s"]),
     .library(name: "Presets", targets: ["Presets"]),
     .library(name: "Root", targets: ["Root"]),
     .library(name: "Support", targets: ["Support"])
   ],
   dependencies: [
-    .package(url: "https://github.com/bradhowes/auv3-support", branch: "main"),
     .package(url: "https://github.com/bradhowes/typedfullstate", branch: "main"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.22.3"),
@@ -51,15 +49,6 @@ let package = Package(
               .product(name: "Sharing", package: "swift-sharing"),
             ]
            ),
-    .target(
-      name: "AudioUnitHost",
-      dependencies: [
-        .product(name: "AUv3Host", package: "auv3-support"),
-        .product(name: "AUv3Shared", package: "auv3-support"),
-        .product(name: "AUv3Component", package: "auv3-support"),
-        .product(name: "TypedFullState", package: "TypedFullState"),
-      ]
-    ),
     .testTarget(
       name: "AudioUnitHostTests"
     )

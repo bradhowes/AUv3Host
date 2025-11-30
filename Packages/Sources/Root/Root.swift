@@ -19,6 +19,9 @@ public struct Root {
     public let engine = AVAudioEngine()
     public var songPlaying: Bool
 
+    public var subtype: String = "samp"
+    public var manufacturer: String = "appl"
+
     public init(instances: AUv3sList.State, presets: PresetsList.State) {
       self.instances = instances
       self.presets = presets
@@ -26,7 +29,8 @@ public struct Root {
     }
   }
 
-  public enum Action {
+  public enum Action: BindableAction {
+    case binding(BindingAction<State>)
     case initialize
     case instances(AUv3sList.Action)
     case noteButtonTapped
@@ -37,11 +41,15 @@ public struct Root {
   public init() {}
 
   public var body: some ReducerOf<Self> {
+    BindingReducer()
     Scope(state: \.instances, action: \.instances) { AUv3sList() }
     Scope(state: \.presets, action: \.presets) { PresetsList() }
 
     Reduce { state, action in
       switch action {
+
+      case .binding:
+        return .none
 
       case .initialize:
         return initialize(&state)
@@ -154,7 +162,7 @@ extension Root {
 }
 
 public struct RootView: View {
-  private var store: StoreOf<Root>
+  @Bindable private var store: StoreOf<Root>
   @Shared(.activeAUv3) var activeAUv3
 
   public init(store: StoreOf<Root>) {
@@ -163,6 +171,26 @@ public struct RootView: View {
 
   public var body: some View {
     VStack(spacing: 16) {
+      Grid(horizontalSpacing: 16.0) {
+        GridRow {
+          HStack {
+            Text("Subtype")
+            TextField("", text: $store.subtype)
+              .textFieldStyle(.roundedBorder)
+              .autocapitalization(.none)
+              .autocorrectionDisabled()
+              .frame(maxWidth: 60)
+          }
+          HStack {
+            Text("Manufacturer")
+            TextField("Manufacturer", text: $store.manufacturer)
+              .textFieldStyle(.roundedBorder)
+              .autocapitalization(.none)
+              .autocorrectionDisabled()
+              .frame(maxWidth: 60)
+          }
+        }.frame(maxWidth: .infinity)
+      }
       HStack(spacing: 16) {
         AUv3sListView(store: store.scope(state: \.instances, action: \.instances))
         PresetsListView(store: store.scope(state: \.presets, action: \.presets))

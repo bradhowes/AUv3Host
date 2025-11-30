@@ -2,8 +2,11 @@
 
 import SwiftUI
 
-// Lifted from https://stackoverflow.com/a/77920319/629836
+/**
+ Provide for async running of a task for generating model data.
 
+ Lifted from https://stackoverflow.com/a/77920319/629836
+ */
 public struct AsyncModel<VisualContent: View, ModelData>: View {
   var viewBuilder: (ModelData) -> VisualContent
   var model: () async throws -> ModelData?
