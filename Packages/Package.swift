@@ -9,7 +9,8 @@ let package = Package(
     .library(name: "AudioUnitHost", targets: ["AudioUnitHost"]),
     .library(name: "AUv3s", targets: ["AUv3s"]),
     .library(name: "Presets", targets: ["Presets"]),
-    .library(name: "Root", targets: ["Root"])
+    .library(name: "Root", targets: ["Root"]),
+    .library(name: "Support", targets: ["Support"])
   ],
   dependencies: [
     .package(url: "https://github.com/bradhowes/auv3-support", branch: "main"),
@@ -23,26 +24,31 @@ let package = Package(
   targets: [
     .target(name: "AUv3s",
             dependencies: [
+              "Support",
               .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-              .product(name: "Dependencies", package: "swift-dependencies"),
-              .product(name: "Sharing", package: "swift-sharing"),
               .product(name: "TypedFullState", package: "TypedFullState")
             ]
            ),
     .target(name: "Presets",
             dependencies: [
+              "Support",
               .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-              .product(name: "Dependencies", package: "swift-dependencies"),
-              .product(name: "Sharing", package: "swift-sharing"),
               .product(name: "TypedFullState", package: "TypedFullState")
             ]
            ),
     .target(name: "Root",
             dependencies: [
+              "AUv3s",
+              "Presets",
+              "Support",
               .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+              .product(name: "TypedFullState", package: "TypedFullState")
+            ]
+           ),
+    .target(name: "Support",
+            dependencies: [
               .product(name: "Dependencies", package: "swift-dependencies"),
               .product(name: "Sharing", package: "swift-sharing"),
-              .product(name: "TypedFullState", package: "TypedFullState")
             ]
            ),
     .target(

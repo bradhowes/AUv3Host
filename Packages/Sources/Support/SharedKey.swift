@@ -1,9 +1,11 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
+import AudioToolbox
 import Foundation
 import Sharing
 
 extension SharedKey where Self == AppStorageKey<UUID?>.Default {
+  public static var activeAUv3: Self { Self[.appStorage("activeAUv3"), default: nil] }
   public static var activePreset: Self { Self[.appStorage("activePreset"), default: nil] }
 }
 

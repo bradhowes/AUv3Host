@@ -4,6 +4,7 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import IdentifiedCollections
+import Support
 
 @DependencyClient
 public struct PresetsStore: Sendable {

@@ -1,160 +1,109 @@
 // Copyright © 2025 Brad Howes. All rights reserved.
 
-import AudioToolbox
+import AUv3s
 import ComposableArchitecture
-import Dependencies
-import DependenciesMacros
+import Presets
+import Support
 import SwiftUI
-import TypedFullState
 
 @Reducer
 public struct Root {
 
-  @Reducer
-  public enum Destination {
-    case presetEditor(PresetEditor)
-  }
-
   @ObservableState
   public struct State: Equatable {
-    @Presents public var destination: Destination.State?
-    public var rows: IdentifiedArrayOf<PresetButton.State> = []
+    public var instances: AUv3sList.State
+    public var presets: PresetsList.State
+
+    public init(instances: AUv3sList.State, presets: PresetsList.State) {
+      self.instances = instances
+      self.presets = presets
+    }
   }
 
   public enum Action {
-    case addButtonTapped
-    case destination(PresentationAction<Destination.Action>)
     case initialize
-    case rows(IdentifiedActionOf<PresetButton>)
+    case instances(AUv3sList.Action)
+    case noteButtonTapped
+    case playButtonTapped
+    case presets(PresetsList.Action)
   }
 
   public init() {}
 
-  @Dependency(\.uuid) var uuid
-  @Dependency(\.presetsStore) var presetsStore
-
   public var body: some ReducerOf<Self> {
+    Scope(state: \.instances, action: \.instances) { AUv3sList() }
+    Scope(state: \.presets, action: \.presets) { PresetsList() }
 
     Reduce { state, action in
-      log.info("reduct \(action)")
+      log.info("reduce \(action)")
       switch action {
-
-      case .addButtonTapped:
-        return addButtonTapped(&state)
-
-      case .destination(.presented(.presetEditor(.delegate(.accepted(let name))))):
-        let id = state.destination?.presetEditor?.id
-        let index = state.rows.firstIndex(where: {$0.preset.id == id})
-        log.info("state.destination?.presetEditor?.id: \(String(describing: id))")
-        log.info("\(String(describing: index))")
-        if let index {
-          state.rows[index].preset.name = name
-        }
-        return .none
-
-      case .destination:
-        return .none
 
       case .initialize:
         return initialize(&state)
 
-      case .rows(.element(id: let id, action: .delegate(let action))):
-        return processRowAction(&state, id: id, action: action)
+      case .instances:
+        return .none
 
-      case .rows:
+      case .noteButtonTapped:
+        return .none
+
+      case .playButtonTapped:
+        return .none
+
+      case .presets:
         return .none
       }
     }
-    .forEach(\.rows, action: \.rows) {
-      PresetButton()
-    }
-    .ifLet(\.$destination, action: \.destination)
   }
 }
 
-extension PresetsList {
+extension Root {
 
-  private func addButtonTapped(_ state: inout State) -> Effect<Action> {
-    state.rows.append(PresetButton.State(preset: .init(name: "New Preset", id: uuid(), fullStateCollection: .init())))
+  private func playButtonTapped(_ state: inout State) -> Effect<Action> {
     return .none
   }
 
   private func initialize(_ state: inout State) -> Effect<Action> {
-    guard let data = presetsStore.restore() else {
-      state.rows = []
-      save(state)
-      return .none
-    }
-
-    if let presets = try? JSONDecoder().decode(Array<Preset>.self, from: data) {
-      state.rows = .init(uniqueElements: presets.map { .init(preset: $0) })
-    }
-
-    return .none
-  }
-
-  private func processRowAction(
-    _ state: inout State,
-    id: PresetButton.State.ID,
-    action: PresetButton.Action.Delegate
-  ) -> Effect<Action> {
-    log.info("reduce \(action)")
-    switch action {
-
-    case .activate(fullStates: let fullStates):
-      log.info("activate: \(fullStates)")
-      break
-
-    case .delete(id: let id):
-      state.rows.remove(id: id)
-      break
-
-    case .edit(id: let id, name: let name):
-      state.destination = .presetEditor(.init(id: id, name: name))
-      break
-    }
-    return .none
-  }
-
-  private func save(_ state: State) {
-    if let data = try? JSONEncoder().encode(state.rows.map(\.preset)) {
-      presetsStore.save(data)
-    }
+    return .merge(
+      reduce(into: &state, action: .instances(.initialize)),
+      reduce(into: &state, action: .presets(.initialize))
+    )
   }
 }
 
-extension PresetsList.Destination.State: Equatable {}
+public struct RootView: View {
+  private var store: StoreOf<Root>
 
-public struct PresetsListView: View {
-  @Bindable private var store: StoreOf<PresetsList>
+  public init(store: StoreOf<Root>) {
+    self.store = store
+  }
 
   public var body: some View {
     VStack {
       HStack {
-        Text("Presets")
-        Spacer()
-        Button {
-          store.send(.addButtonTapped)
-        } label: {
-          Text("Add")
-        }
+        AUv3sListView(store: store.scope(state: \.instances, action: \.instances))
+        PresetsListView(store: store.scope(state: \.presets, action: \.presets))
       }
-      List {
-        ForEach(store.scope(state: \.rows, action: \.rows)) { store in
-          PresetButtonView(store: store)
+      HStack {
+        Button {
+          store.send(.playButtonTapped)
+        } label: {
+          Text("Play")
+        }
+        Button {
+          store.send(.noteButtonTapped)
+        } label: {
+          Text("Note")
         }
       }
     }
     .task {
       await store.send(.initialize).finish()
     }
-    .sheet(item: $store.scope(state: \.destination?.presetEditor, action: \.destination.presetEditor)) {
-      PresetEditorView(store: $0)
-    }
   }
 }
 
-extension PresetsListView {
+extension RootView {
 
   static var preview: some View {
     prepareDependencies {
@@ -162,13 +111,13 @@ extension PresetsListView {
       $0.presetsStore = .previewValue
     }
     return VStack {
-      PresetsListView(store: Store(initialState: .init()) { PresetsList() })
+      RootView(store: Store(initialState: .init(instances: AUv3sList.State(), presets: PresetsList.State())) { Root() })
     }
   }
 }
 
-private let log = Logger(category: "PresetsList")
+private let log = Logger(category: "Root")
 
 #Preview {
-  PresetsListView.preview
+  RootView.preview
 }
