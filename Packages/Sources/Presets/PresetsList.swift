@@ -163,21 +163,26 @@ public struct PresetsListView: View {
   }
 }
 
+#if DEBUG
+
 extension PresetsListView {
 
   static var preview: some View {
     prepareDependencies {
       $0.uuid = .incrementing
       $0.presetsStore = .previewValue
-    }
-    return VStack {
-      PresetsListView(store: Store(initialState: .init()) { PresetsList() })
+      return VStack {
+        PresetsListView(store: Store(initialState: .init()) { PresetsList() })
+      }
     }
   }
 }
 
-private let log = Logger(category: "PresetsList")
-
 #Preview {
   PresetsListView.preview
+    .padding()
 }
+
+#endif // DEBUG
+
+private let log = Logger(category: "PresetsList")

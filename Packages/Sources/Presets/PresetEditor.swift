@@ -107,12 +107,16 @@ public struct PresetEditorView: View {
   }
 }
 
+#if DEBUG
+
 extension PresetEditorView {
   static var preview: some View {
-    return PresetEditorView(store: Store(initialState: .init(id: UUID(), name: "Testing")) { PresetEditor() })
+    PresetEditorView(store: Store(initialState: .init(id: UUID(), name: "Testing")) { PresetEditor() })
   }
 }
 
 #Preview {
   PresetEditorView.preview
 }
+
+#endif // DEBUG

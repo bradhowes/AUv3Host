@@ -247,22 +247,27 @@ public struct RootView: View {
   }
 }
 
+#if DEBUG
+
 extension RootView {
 
   static var preview: some View {
     prepareDependencies {
       $0.uuid = .incrementing
       $0.presetsStore = .previewValue
+      return RootView(
+        store: Store(initialState: .init(instances: AUv3sList.State(), presets: PresetsList.State())) {
+          Root()
+        }
+      ).safeAreaPadding(16)
     }
-    return VStack {
-      RootView(store: Store(initialState: .init(instances: AUv3sList.State(), presets: PresetsList.State())) { Root() })
-    }
-    .safeAreaPadding(16)
   }
 }
-
-private let log = Logger(category: "Root")
 
 #Preview {
   RootView.preview
 }
+
+#endif // DEBUG
+
+private let log = Logger(category: "Root")

@@ -188,28 +188,29 @@ public struct AUv3sListView: View {
   }
 }
 
+#if DEBUG
+
 extension AUv3sListView {
 
   static var preview: some View {
     prepareDependencies {
       $0.uuid = .incrementing
-    }
-    @Shared(.auv3InstanceCount) var auv3InstanceCount
-    $auv3InstanceCount.withLock { $0 = 3 }
-    return VStack {
-      AUv3sListView(store: Store(initialState: .init()) { AUv3sList() })
+
+      @Shared(.auv3InstanceCount) var auv3InstanceCount
+      $auv3InstanceCount.withLock { $0 = 3 }
+
+      return VStack {
+        AUv3sListView(store: Store(initialState: .init()) { AUv3sList() })
+      }
     }
   }
 }
-
-private let log = Logger(category: "AUv3sList")
 
 #Preview {
   AUv3sListView.preview
+    .padding()
 }
 
-struct Previews_AUv3sList_LibraryContent: LibraryContentProvider {
-  var views: [LibraryItem] {
-    LibraryItem(/*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/)
-  }
-}
+#endif // DEBUG
+
+private let log = Logger(category: "AUv3sList")

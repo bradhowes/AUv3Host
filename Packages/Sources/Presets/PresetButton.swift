@@ -106,61 +106,65 @@ public struct PresetButtonView: View {
   }
 }
 
+#if DEBUG
+
 extension PresetButtonView {
 
   static var preview: some View {
     prepareDependencies {
       $0.uuid = .incrementing
-    }
-    @Dependency(\.uuid) var uuid
-    return VStack {
-      List {
-        PresetButtonView(
-          store: Store(
-            initialState: .init(
-              preset: .init(
-                name: "First",
-                id: uuid(),
-                fullStateCollection: .init()
+      @Dependency(\.uuid) var uuid
+      return VStack {
+        List {
+          PresetButtonView(
+            store: Store(
+              initialState: .init(
+                preset: .init(
+                  name: "First",
+                  id: uuid(),
+                  fullStateCollection: .init()
+                )
               )
-            )
-          ) {
-            PresetButton()
-          }
-        )
-        PresetButtonView(
-          store: Store(
-            initialState: .init(
-              preset: .init(
-                name: "Second",
-                id: uuid(),
-                fullStateCollection: .init()
+            ) {
+              PresetButton()
+            }
+          )
+          PresetButtonView(
+            store: Store(
+              initialState: .init(
+                preset: .init(
+                  name: "Second",
+                  id: uuid(),
+                  fullStateCollection: .init()
+                )
               )
-            )
-          ) {
-            PresetButton()
-          }
-        )
-        PresetButtonView(
-          store: Store(
-            initialState: .init(
-              preset: .init(
-                name: "Third",
-                id: uuid(),
-                fullStateCollection: .init()
+            ) {
+              PresetButton()
+            }
+          )
+          PresetButtonView(
+            store: Store(
+              initialState: .init(
+                preset: .init(
+                  name: "Third",
+                  id: uuid(),
+                  fullStateCollection: .init()
+                )
               )
-            )
-          ) {
-            PresetButton()
-          }
-        )
+            ) {
+              PresetButton()
+            }
+          )
+        }
       }
     }
   }
 }
 
-private let log = Logger(category: "PresetButton")
-
 #Preview {
   PresetButtonView.preview
 }
+
+#endif // DEBUG
+
+private let log = Logger(category: "PresetButton")

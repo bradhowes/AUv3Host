@@ -7,7 +7,6 @@ import Support
 import SwiftUI
 import TypedFullState
 
-
 @Reducer
 public struct AUv3Button {
 
@@ -112,52 +111,56 @@ public struct AUv3ButtonView: View {
   }
 }
 
+#if DEBUG
+
 extension AUv3ButtonView {
 
   static var preview: some View {
     prepareDependencies {
       $0.uuid = .incrementing
       $0.componentDescription = .previewValue
-    }
 
-    @Dependency(\.uuid) var uuid
-    @Dependency(\.componentDescription) var componentDescription
+      @Dependency(\.uuid) var uuid
+      @Dependency(\.componentDescription) var componentDescription
 
-    return VStack {
-      List {
-        AsyncModel { instance in
-          AUv3ButtonView(
-            store: Store(
-              initialState: .init(
-                instance: instance
-              )
-            ) {
-              AUv3Button()
-            }
-          )
-        } model: {
-          try await AUv3Instance.make(component: componentDescription)
-        }
-        AsyncModel { instance in
-          AUv3ButtonView(
-            store: Store(
-              initialState: .init(
-                instance: instance
-              )
-            ) {
-              AUv3Button()
-            }
-          )
-        } model: {
-          try await AUv3Instance.make(component: componentDescription)
+      return VStack {
+        List {
+          AsyncModel { instance in
+            AUv3ButtonView(
+              store: Store(
+                initialState: .init(
+                  instance: instance
+                )
+              ) {
+                AUv3Button()
+              }
+            )
+          } model: {
+            try await AUv3Instance.make(component: componentDescription)
+          }
+          AsyncModel { instance in
+            AUv3ButtonView(
+              store: Store(
+                initialState: .init(
+                  instance: instance
+                )
+              ) {
+                AUv3Button()
+              }
+            )
+          } model: {
+            try await AUv3Instance.make(component: componentDescription)
+          }
         }
       }
     }
   }
 }
 
-private let log = Logger(category: "AUv3Button")
-
-#Preview {
+#Preview("buttons") {
   AUv3ButtonView.preview
 }
+
+#endif // DEBUG
+
+private let log = Logger(category: "AUv3Button")
