@@ -39,15 +39,24 @@ public struct AUv3Instance: Equatable, Identifiable {
     log.info("make: \(component.description)")
     let audioUnit = try await AVAudioUnit.instantiate(with: component)
     log.info("created audio unit")
+
+    let viewController = try await makeUI(audioUnit: audioUnit)
+    log.info("created view controller")
+    @Dependency(\.uuid) var uuid
+    return .init(id: uuid(), audioUnit: audioUnit, viewController: viewController)
+  }
+
+  @MainActor
+  public static func makeUI(audioUnit: AVAudioUnit) async throws -> UIViewController {
     guard let viewController = await audioUnit.auAudioUnit.requestViewController() else {
       log.info("failed to create view controller")
       throw AUv3InstanceError.noViewController
     }
     log.info("created view controller")
-    @Dependency(\.uuid) var uuid
-    return .init(id: uuid(), audioUnit: audioUnit, viewController: viewController)
+    return viewController
   }
 }
 
-
 private let log = Logger(category: "AUv3Instance")
+
+extension AVAudioUnit: @retroactive @unchecked Sendable {}
