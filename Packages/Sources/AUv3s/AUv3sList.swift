@@ -21,11 +21,11 @@ public struct AUv3sList {
 
   public enum Action {
     case add(instance: AUv3Instance)
-    case addButtonTapped
     case delegate(Delegate)
     case initialize
     case rows(IdentifiedActionOf<AUv3Button>)
     case playNote
+    case settingsButtonTapped
     case startLoops
     case stopLoops
 
@@ -33,6 +33,7 @@ public struct AUv3sList {
     public enum Delegate {
       case added(instance: AUv3Instance)
       case removed(instance: AUv3Instance)
+      case settings
     }
   }
 
@@ -49,9 +50,6 @@ public struct AUv3sList {
       case .add(instance: let instance):
         return add(&state, instance: instance)
 
-      case .addButtonTapped:
-        return addButtonTapped(&state)
-
       case .delegate:
         return .none
 
@@ -66,6 +64,9 @@ public struct AUv3sList {
 
       case .rows:
         return .none
+
+      case .settingsButtonTapped:
+        return .send(.delegate(.settings))
 
       case .startLoops:
         return startLoops(&state)
@@ -87,7 +88,19 @@ extension AUv3sList {
     return .send(.delegate(.added(instance: instance)))
   }
 
-  private func addButtonTapped(_ state: inout State) -> Effect<Action> {
+  private func initialize(_ state: inout State) -> Effect<Action> {
+    @Shared(.auv3InstanceCount) var auv3InstanceCount
+    log.info("initialize: \(auv3InstanceCount)")
+    if state.rows.count < auv3InstanceCount {
+      return .merge((0..<(auv3InstanceCount - state.rows.count)).map { _ in makeInstance(&state) })
+    } else if state.rows.count > auv3InstanceCount {
+      return .merge((0..<(auv3InstanceCount - state.rows.count)).map { _ in removeInstance(&state) })
+    } else {
+      return .none
+    }
+  }
+
+  private func makeInstance(_ state: inout State) -> Effect<Action> {
     .run { send in
       @Dependency(\.componentDescription) var componentDescription
       let instance = try await AUv3Instance.make(component: componentDescription)
@@ -95,10 +108,9 @@ extension AUv3sList {
     }
   }
 
-  private func initialize(_ state: inout State) -> Effect<Action> {
-    @Shared(.auv3InstanceCount) var auv3InstanceCount
-    log.info("initialize: \(auv3InstanceCount)")
-    return .merge((0..<min(1, auv3InstanceCount)).map { _ in addButtonTapped(&state) })
+  private func removeInstance(_ state: inout State) -> Effect<Action> {
+    guard let button = state.rows.popLast() else { return .none }
+    return .send(.delegate(.removed(instance: button.instance)))
   }
 
   private func playNote(_ state: inout State) -> Effect<Action> {
@@ -159,9 +171,9 @@ public struct AUv3sListView: View {
         Text("AUv3 Instances")
         Spacer()
         Button {
-          store.send(.addButtonTapped)
+          store.send(.settingsButtonTapped)
         } label: {
-          Text("Add")
+          Image(systemName: "gear")
         }
       }
       List {
@@ -182,6 +194,8 @@ extension AUv3sListView {
     prepareDependencies {
       $0.uuid = .incrementing
     }
+    @Shared(.auv3InstanceCount) var auv3InstanceCount
+    $auv3InstanceCount.withLock { $0 = 3 }
     return VStack {
       AUv3sListView(store: Store(initialState: .init()) { AUv3sList() })
     }

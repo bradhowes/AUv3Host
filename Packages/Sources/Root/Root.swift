@@ -4,33 +4,50 @@ import AVFAudio
 import AUv3s
 import ComposableArchitecture
 import Presets
+import Settings
 import Support
 import SwiftUI
 
 @Reducer
 public struct Root {
 
+  public static func prepareDependencies(subtype: String, manufacturer: String) {
+    @Shared(.componentSubtype) var componentSubtype
+    $componentSubtype.withLock { $0 = subtype }
+    @Shared(.componentManufacturer) var componentManufacturer
+    $componentManufacturer.withLock { $0 = manufacturer }
+    Dependencies.prepareDependencies {
+      $0.componentDescription = .liveValue
+      $0.presetsStore = .liveValue
+    }
+  }
+
+  @Reducer
+  public enum Destination {
+    case settings(Settings)
+  }
+
   @ObservableState
   public struct State: Equatable {
+    @Presents public var destination: Destination.State?
+
     public var instances: AUv3sList.State
     public var presets: PresetsList.State
+    public var songPlaying: Bool
 
     @ObservationStateIgnored
     public let engine = AVAudioEngine()
-    public var songPlaying: Bool
 
-    public var subtype: String = "samp"
-    public var manufacturer: String = "appl"
-
-    public init(instances: AUv3sList.State, presets: PresetsList.State) {
-      self.instances = instances
-      self.presets = presets
+    public init(instances: AUv3sList.State? = nil, presets: PresetsList.State? = nil) {
+      self.instances = instances ?? .init()
+      self.presets = presets ?? .init()
       self.songPlaying = false
     }
   }
 
   public enum Action: BindableAction {
     case binding(BindingAction<State>)
+    case destination(PresentationAction<Destination.Action>)
     case initialize
     case instances(AUv3sList.Action)
     case noteButtonTapped
@@ -51,8 +68,26 @@ public struct Root {
       case .binding:
         return .none
 
+      case .destination(.presented(.settings(.delegate(.accepted)))):
+        return reduce(into: &state, action: .instances(.initialize))
+//        let id = state.destination?.presetEditor?.id
+//        let index = state.rows.firstIndex(where: {$0.preset.id == id})
+//        log.info("state.destination?.presetEditor?.id: \(String(describing: id))")
+//        log.info("\(String(describing: index))")
+//        if let index {
+//          state.rows[index].preset.name = name
+//        }
+        // return .none
+
+      case .destination:
+        return .none
+
       case .initialize:
         return initialize(&state)
+
+      case .instances(.delegate(.settings)):
+        state.destination = .settings(.init())
+        return .none
 
       case .instances(.delegate(.added(instance: let instance))):
         return addInstance(&state, instance: instance)
@@ -73,6 +108,7 @@ public struct Root {
         return .none
       }
     }
+    .ifLet(\.$destination, action: \.destination)
   }
 
   private enum CancelId {
@@ -140,11 +176,9 @@ extension Root {
     if state.songPlaying == true {
       state.songPlaying = false
     }
-
     if state.engine.isRunning {
       state.engine.stop()
     }
-
     return reduce(into: &state, action: .instances(.stopLoops))
   }
 
@@ -161,6 +195,8 @@ extension Root {
   }
 }
 
+extension Root.Destination.State: Equatable {}
+
 public struct RootView: View {
   @Bindable private var store: StoreOf<Root>
   @Shared(.activeAUv3) var activeAUv3
@@ -171,26 +207,6 @@ public struct RootView: View {
 
   public var body: some View {
     VStack(spacing: 16) {
-      Grid(horizontalSpacing: 16.0) {
-        GridRow {
-          HStack {
-            Text("Subtype")
-            TextField("", text: $store.subtype)
-              .textFieldStyle(.roundedBorder)
-              .autocapitalization(.none)
-              .autocorrectionDisabled()
-              .frame(maxWidth: 60)
-          }
-          HStack {
-            Text("Manufacturer")
-            TextField("Manufacturer", text: $store.manufacturer)
-              .textFieldStyle(.roundedBorder)
-              .autocapitalization(.none)
-              .autocorrectionDisabled()
-              .frame(maxWidth: 60)
-          }
-        }.frame(maxWidth: .infinity)
-      }
       HStack(spacing: 16) {
         AUv3sListView(store: store.scope(state: \.instances, action: \.instances))
         PresetsListView(store: store.scope(state: \.presets, action: \.presets))
@@ -200,7 +216,7 @@ public struct RootView: View {
           Button {
             store.send(.playButtonTapped)
           } label: {
-            Text(store.songPlaying ? "Stop Song" : "Start Song")
+            Text(store.songPlaying ? "Stop Notes" : "Play Notes")
           }.disabled(store.instances.rows.isEmpty)
 
           Button {
@@ -224,6 +240,9 @@ public struct RootView: View {
     }
     .task {
       await store.send(.initialize).finish()
+    }
+    .sheet(item: $store.scope(state: \.destination?.settings, action: \.destination.settings)) {
+      SettingsView(store: $0)
     }
   }
 }

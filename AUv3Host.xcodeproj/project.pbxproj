@@ -8,17 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		BD085FFF27A2EB13002B4E38 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD085FFE27A2EB13002B4E38 /* AudioToolbox.framework */; };
-		BDC5884D2843859D00385B84 /* AudioUnitHost in Frameworks */ = {isa = PBXBuildFile; productRef = BDC5884C2843859D00385B84 /* AudioUnitHost */; };
-		BDC58851284390DD00385B84 /* PresetDocumentManager in Frameworks */ = {isa = PBXBuildFile; productRef = BDC58850284390DD00385B84 /* PresetDocumentManager */; };
+		BDBDE29F2EDDB0F1006FE29A /* Root in Frameworks */ = {isa = PBXBuildFile; productRef = BDBDE29E2EDDB0F1006FE29A /* Root */; };
 		C404AF0B224E92E900DA7170 /* ComponentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C404AF0A224E92E900DA7170 /* ComponentViewController.swift */; };
 		C4073D3D22723FAE0049E662 /* AlertExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4073D3C22723FAE0049E662 /* AlertExtensions.swift */; };
 		C4145E1622690480009F33DD /* PresetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4145E1522690480009F33DD /* PresetsViewController.swift */; };
 		C43B7169224D6A1500FA309D /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43B7167224D6A1100FA309D /* ListViewController.swift */; };
 		C43B716B224D702400FA309D /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43B716A224D702400FA309D /* MainViewController.swift */; };
-		C49B3102222459BB0003E2C4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49B30FA222459AF0003E2C4 /* MainViewController.swift */; };
 		C49B3103222459C00003E2C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C49B30FB222459AF0003E2C4 /* Assets.xcassets */; };
-		C49B3105222459D90003E2C4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C49B30FE222459AF0003E2C4 /* Main.storyboard */; };
-		C49B3106222459DE0003E2C4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49B3100222459AF0003E2C4 /* AppDelegate.swift */; };
+		C49B3106222459DE0003E2C4 /* AUv3Host.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49B3100222459AF0003E2C4 /* AUv3Host.swift */; };
 		C49B310822245C030003E2C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C49B30F3222459AF0003E2C4 /* Assets.xcassets */; };
 		C49B310922245C030003E2C4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49B30F6222459AF0003E2C4 /* AppDelegate.swift */; };
 		C49B310A22245C090003E2C4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C49B30F4222459AF0003E2C4 /* Main.storyboard */; };
@@ -48,10 +45,8 @@
 		C49B30F5222459AF0003E2C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C49B30F6222459AF0003E2C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C49B30F7222459AF0003E2C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C49B30FA222459AF0003E2C4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C49B30FB222459AF0003E2C4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C49B30FF222459AF0003E2C4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		C49B3100222459AF0003E2C4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C49B3100222459AF0003E2C4 /* AUv3Host.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AUv3Host.swift; sourceTree = "<group>"; };
 		C49B3101222459AF0003E2C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C4D3624022691E3100E73DF4 /* SaveSheetViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveSheetViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,9 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDBDE29F2EDDB0F1006FE29A /* Root in Frameworks */,
 				BD085FFF27A2EB13002B4E38 /* AudioToolbox.framework in Frameworks */,
-				BDC5884D2843859D00385B84 /* AudioUnitHost in Frameworks */,
-				BDC58851284390DD00385B84 /* PresetDocumentManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -166,9 +160,7 @@
 		C49B30F9222459AF0003E2C4 /* AUv3Host */ = {
 			isa = PBXGroup;
 			children = (
-				C49B3100222459AF0003E2C4 /* AppDelegate.swift */,
-				C49B30FA222459AF0003E2C4 /* MainViewController.swift */,
-				C49B30FE222459AF0003E2C4 /* Main.storyboard */,
+				C49B3100222459AF0003E2C4 /* AUv3Host.swift */,
 				C49B30FB222459AF0003E2C4 /* Assets.xcassets */,
 				C49B3101222459AF0003E2C4 /* Info.plist */,
 			);
@@ -192,8 +184,7 @@
 			);
 			name = "AUv3Host iOS";
 			packageProductDependencies = (
-				BDC5884C2843859D00385B84 /* AudioUnitHost */,
-				BDC58850284390DD00385B84 /* PresetDocumentManager */,
+				BDBDE29E2EDDB0F1006FE29A /* Root */,
 			);
 			productName = "AUv3Host iOS";
 			productReference = C40DA91421FB6CC600F0FE9A /* AUv3Host.app */;
@@ -267,7 +258,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C49B3103222459C00003E2C4 /* Assets.xcassets in Resources */,
-				C49B3105222459D90003E2C4 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,8 +277,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C49B3106222459DE0003E2C4 /* AppDelegate.swift in Sources */,
-				C49B3102222459BB0003E2C4 /* MainViewController.swift in Sources */,
+				C49B3106222459DE0003E2C4 /* AUv3Host.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,14 +302,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C49B30F5222459AF0003E2C4 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		C49B30FE222459AF0003E2C4 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C49B30FF222459AF0003E2C4 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -472,6 +453,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = iOS/AUv3Host/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -481,7 +463,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AUv3Host${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.braysoftware.AUv3Host;
 				PRODUCT_NAME = "$(PROJECT_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -542,6 +524,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = iOS/AUv3Host/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -550,7 +533,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.AUv3Host${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.braysoftware.AUv3Host;
 				PRODUCT_NAME = "$(PROJECT_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
@@ -740,13 +723,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		BDC5884C2843859D00385B84 /* AudioUnitHost */ = {
+		BDBDE29E2EDDB0F1006FE29A /* Root */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = AudioUnitHost;
-		};
-		BDC58850284390DD00385B84 /* PresetDocumentManager */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PresetDocumentManager;
+			productName = Root;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

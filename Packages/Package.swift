@@ -9,6 +9,7 @@ let package = Package(
     .library(name: "AUv3s", targets: ["AUv3s"]),
     .library(name: "Presets", targets: ["Presets"]),
     .library(name: "Root", targets: ["Root"]),
+    .library(name: "Settings", targets: ["Settings"]),
     .library(name: "Support", targets: ["Support"])
   ],
   dependencies: [
@@ -38,9 +39,16 @@ let package = Package(
             dependencies: [
               "AUv3s",
               "Presets",
+              "Settings",
               "Support",
               .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
               .product(name: "TypedFullState", package: "TypedFullState")
+            ]
+           ),
+    .target(name: "Settings",
+            dependencies: [
+              "Support",
+              .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
            ),
     .target(name: "Support",

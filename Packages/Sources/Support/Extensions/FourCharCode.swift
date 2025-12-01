@@ -43,7 +43,8 @@ extension FourCharCode {
 extension FourCharCode: @retroactive ExpressibleByStringLiteral {}
 
 extension Character {
-  fileprivate var isPrintableASCII: Bool {
+
+  public var isPrintableASCII: Bool {
     guard let ascii = asciiValue else { return false }
     return 32..<127 ~= ascii
   }
