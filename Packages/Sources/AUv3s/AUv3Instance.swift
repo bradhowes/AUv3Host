@@ -14,9 +14,7 @@ public enum AUv3InstanceError: Error {
   case noViewController
 }
 
-public struct AUv3Instance: Equatable, Identifiable {
-  public typealias ID = UUID
-  public let id: ID
+public struct AUv3Instance: Equatable {
   public let audioUnit: AVAudioUnit
   public let viewController: UIViewController
 
@@ -26,34 +24,35 @@ public struct AUv3Instance: Equatable, Identifiable {
   }
 
   public var name: String {
-    audioUnit.auAudioUnit.audioUnitShortName ?? "???"
-  }
-
-  public init(id: UUID, audioUnit: AVAudioUnit, viewController: UIViewController) {
-    self.id = id
-    self.audioUnit = audioUnit
-    self.viewController = viewController
+    audioUnit.auAudioUnit.audioUnitShortName ?? "n/a"
   }
 
   public static func make(component: AudioComponentDescription) async throws -> AUv3Instance {
-    log.info("make: \(component.description)")
+    log.info("make BEGIN - \(component.description)")
     let audioUnit = try await AVAudioUnit.instantiate(with: component)
-    log.info("created audio unit")
+    log.info("make - created audio unit")
 
-    let viewController = try await makeUI(audioUnit: audioUnit)
-    log.info("created view controller")
-    @Dependency(\.uuid) var uuid
-    return .init(id: uuid(), audioUnit: audioUnit, viewController: viewController)
-  }
-
-  @MainActor
-  public static func makeUI(audioUnit: AVAudioUnit) async throws -> UIViewController {
     guard let viewController = await audioUnit.auAudioUnit.requestViewController() else {
-      log.info("failed to create view controller")
+      log.info("make - failed to create view controller")
       throw AUv3InstanceError.noViewController
     }
-    log.info("created view controller")
-    return viewController
+    log.info("make END")
+    return .init(audioUnit: audioUnit, viewController: viewController)
+  }
+
+  private init(audioUnit: AVAudioUnit, viewController: UIViewController) {
+    self.audioUnit = audioUnit
+    self.viewController = viewController
+    log.info("init - audioUnit: \(audioUnit) / viewController: \(viewController)")
+  }
+}
+
+extension String.StringInterpolation {
+  public mutating func appendInterpolation(_ value: AUv3Instance) {
+    appendLiteral("""
+<AUv3Instance: \(Unmanaged.passUnretained(value.audioUnit).toOpaque()), \
+\(Unmanaged.passUnretained(value.viewController).toOpaque())>
+""")
   }
 }
 

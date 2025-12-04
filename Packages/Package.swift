@@ -55,7 +55,7 @@ let package = Package(
             dependencies: [
               .product(name: "Dependencies", package: "swift-dependencies"),
               .product(name: "Sharing", package: "swift-sharing"),
-            ]
+            ],
            ),
     .testTarget(
       name: "AudioUnitHostTests"

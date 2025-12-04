@@ -7,7 +7,7 @@ import SwiftUI
 struct AUv3HostApp: App {
 
   init() {
-    Root.prepareDependencies(subtype: "samp", manufacturer: "appl")
+    Root.prepareDependencies()
   }
 
   var body: some Scene {

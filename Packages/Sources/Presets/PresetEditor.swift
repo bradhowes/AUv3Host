@@ -115,7 +115,7 @@ extension PresetEditorView {
   }
 }
 
-#Preview {
+#Preview("PresetEditor") {
   PresetEditorView.preview
 }
 

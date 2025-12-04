@@ -178,7 +178,7 @@ extension PresetsListView {
   }
 }
 
-#Preview {
+#Preview("PresetsList") {
   PresetsListView.preview
     .padding()
 }

@@ -44,7 +44,7 @@ public struct AUv3sList {
   public var body: some ReducerOf<Self> {
 
     Reduce { state, action in
-      log.info("reduce \(action)")
+      // log.info("reduce \(action)")
       switch action {
 
       case .add(instance: let instance):
@@ -84,7 +84,7 @@ public struct AUv3sList {
 extension AUv3sList {
 
   private func add(_ state: inout State, instance: AUv3Instance) -> Effect<Action> {
-    state.rows.append(.init(instance: instance))
+    state.rows.append(.init(id: uuid(), instance: instance))
     return .send(.delegate(.added(instance: instance)))
   }
 
@@ -121,6 +121,23 @@ extension AUv3sList {
     return .none
   }
 
+  private func processRowAction(
+    _ state: inout State,
+    id: AUv3Button.State.ID,
+    action: AUv3Button.Action.Delegate
+  ) -> Effect<Action> {
+    // log.info("reduce \(action)")
+    if case .delete(id: let id) = action {
+      guard let removed = state.rows.remove(id: id) else { return .none }
+      @Shared(.activeAUv3) var activeAUv3
+      if id == activeAUv3 {
+        $activeAUv3.withLock { $0 = state.rows.last?.id }
+      }
+      return .send(.delegate(.removed(instance: removed.instance)))
+    }
+    return .none
+  }
+
   private func startLoops(_ state: inout State) -> Effect<Action> {
     .merge(state.rows.map {
       reduce(into: &state, action: .rows(.element(id: $0.id, action: .startLoop)))
@@ -131,30 +148,6 @@ extension AUv3sList {
     .merge(state.rows.map {
       reduce(into: &state, action: .rows(.element(id: $0.id, action: .stopLoop)))
     })
-  }
-
-  private func processRowAction(
-    _ state: inout State,
-    id: AUv3Button.State.ID,
-    action: AUv3Button.Action.Delegate
-  ) -> Effect<Action> {
-    log.info("reduce \(action)")
-    switch action {
-
-    case .activate(instance: let instance):
-      log.info("activate: \(instance)")
-      break
-
-    case .delete(id: let id):
-      guard let removed = state.rows.remove(id: id) else { return .none }
-      @Shared(.activeAUv3) var activeAUv3
-      if id == activeAUv3 {
-        $activeAUv3.withLock { $0 = state.rows.last?.id }
-      }
-      return .send(.delegate(.removed(instance: removed.instance)))
-    }
-
-    return .none
   }
 }
 
@@ -206,7 +199,7 @@ extension AUv3sListView {
   }
 }
 
-#Preview {
+#Preview("AUv3sList") {
   AUv3sListView.preview
     .padding()
 }

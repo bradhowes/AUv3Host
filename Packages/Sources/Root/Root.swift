@@ -11,11 +11,7 @@ import SwiftUI
 @Reducer
 public struct Root {
 
-  public static func prepareDependencies(subtype: String, manufacturer: String) {
-    @Shared(.componentSubtype) var componentSubtype
-    $componentSubtype.withLock { $0 = subtype }
-    @Shared(.componentManufacturer) var componentManufacturer
-    $componentManufacturer.withLock { $0 = manufacturer }
+  public static func prepareDependencies() {
     Dependencies.prepareDependencies {
       $0.componentDescription = .liveValue
       $0.presetsStore = .liveValue
@@ -31,6 +27,7 @@ public struct Root {
   public struct State: Equatable {
     @Presents public var destination: Destination.State?
 
+    @Shared(.activeAUv3) var activeAUv3
     public var instances: AUv3sList.State
     public var presets: PresetsList.State
     public var songPlaying: Bool
@@ -70,14 +67,6 @@ public struct Root {
 
       case .destination(.presented(.settings(.delegate(.accepted)))):
         return reduce(into: &state, action: .instances(.initialize))
-//        let id = state.destination?.presetEditor?.id
-//        let index = state.rows.firstIndex(where: {$0.preset.id == id})
-//        log.info("state.destination?.presetEditor?.id: \(String(describing: id))")
-//        log.info("\(String(describing: index))")
-//        if let index {
-//          state.rows[index].preset.name = name
-//        }
-        // return .none
 
       case .destination:
         return .none
@@ -199,7 +188,6 @@ extension Root.Destination.State: Equatable {}
 
 public struct RootView: View {
   @Bindable private var store: StoreOf<Root>
-  @Shared(.activeAUv3) var activeAUv3
 
   public init(store: StoreOf<Root>) {
     self.store = store
@@ -223,19 +211,25 @@ public struct RootView: View {
             store.send(.noteButtonTapped)
           } label: {
             Text("Instance Note")
-          }.disabled(activeAUv3 == nil)
+          }.disabled(store.activeAUv3 == nil)
         }.frame(maxWidth: .infinity)
       }
-      Group {
-        if let activeAUv3,
-           let index = store.instances.rows.index(id: activeAUv3) {
-          let row = store.instances.rows[index]
-          AUv3View(instance: row.instance)
-            .id(row.instance.id)
-        } else {
-          Text("No AUv3 instance selected")
-            .frame(maxHeight: .infinity)
-        }
+//      ScrollView {
+//        VStack {
+//          ForEach(store.scope(state: \.instances.rows, action: \.instances.rows)) { row in
+//            AUv3View(id: row.id, instance: row.instance)
+//              .frame(minWidth: 100, minHeight: 400, maxHeight: .infinity)
+//          }
+//        }
+//      }
+      if let activeAUv3 = store.activeAUv3,
+         let index = store.instances.rows.index(id: activeAUv3) {
+        let row = store.instances.rows[index]
+        AUv3View(id: activeAUv3, instance: row.instance)
+          .id(activeAUv3)
+      } else {
+        Text("No AUv3 instance selected")
+          .frame(maxHeight: .infinity)
       }
     }
     .task {
@@ -264,7 +258,7 @@ extension RootView {
   }
 }
 
-#Preview {
+#Preview("Root") {
   RootView.preview
 }
 

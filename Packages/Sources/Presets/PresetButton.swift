@@ -161,7 +161,7 @@ extension PresetButtonView {
   }
 }
 
-#Preview {
+#Preview("PresetButtons") {
   PresetButtonView.preview
 }
 
